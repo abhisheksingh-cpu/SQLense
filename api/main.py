@@ -8,7 +8,9 @@ from src.explain import predict_latency
 app = FastAPI(title="SQLense API")
 
 
-from fastapi.middleware.cors import CORSMiddleware
+# --------------------------------------------------
+# CORS
+# --------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,14 +20,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# --------------------------------------------------
+# Request model
+# --------------------------------------------------
+
 class QueryRequest(BaseModel):
     query: str
 
+
+# --------------------------------------------------
+# Home
+# --------------------------------------------------
 
 @app.get("/")
 def home():
     return {"message": "SQLense API is running"}
 
+
+# --------------------------------------------------
+# Predict latency
+# --------------------------------------------------
 
 @app.post("/predict")
 def predict(request: QueryRequest):
