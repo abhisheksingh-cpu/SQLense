@@ -2,7 +2,7 @@ import psycopg2
 import joblib
 import pandas as pd
 
-from features import extract_features
+from src.features import extract_features
 
 
 import os
