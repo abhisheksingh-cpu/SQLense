@@ -8,6 +8,8 @@ from src.explain import predict_latency
 app = FastAPI(title="SQLense API")
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
