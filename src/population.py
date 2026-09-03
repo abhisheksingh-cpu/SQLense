@@ -1,6 +1,7 @@
 import os
 import random
 import psycopg2
+from psycopg2.extras import execute_values
 
 from dotenv import load_dotenv
 
@@ -21,9 +22,11 @@ genders = ["Male", "Female"]
 statuses = ["Completed", "Scheduled", "Cancelled"]
 
 
-# -----------------------------
+# --------------------------------------------------
 # Patients
-# -----------------------------
+# --------------------------------------------------
+
+print("Generating patients...")
 
 patients = [
     (
@@ -35,20 +38,28 @@ patients = [
     for i in range(100000)
 ]
 
-cur.executemany(
+print("Inserting patients...")
+
+execute_values(
+    cur,
     """
     INSERT INTO patients(name, age, gender, city)
-    VALUES (%s, %s, %s, %s)
+    VALUES %s
     """,
-    patients
+    patients,
+    page_size=1000
 )
+
+conn.commit()
 
 print("Patients inserted:", len(patients))
 
 
-# -----------------------------
+# --------------------------------------------------
 # Doctors
-# -----------------------------
+# --------------------------------------------------
+
+print("Generating doctors...")
 
 doctors = [
     (
@@ -59,49 +70,56 @@ doctors = [
     for i in range(1000)
 ]
 
-cur.executemany(
+print("Inserting doctors...")
+
+execute_values(
+    cur,
     """
     INSERT INTO doctors(name, specialization, city)
-    VALUES (%s, %s, %s)
+    VALUES %s
     """,
-    doctors
+    doctors,
+    page_size=500
 )
+
+conn.commit()
 
 print("Doctors inserted:", len(doctors))
 
 
-# -----------------------------
+# --------------------------------------------------
 # Appointments
-# -----------------------------
+# --------------------------------------------------
+
+print("Generating appointments...")
 
 appointments = [
     (
         random.randint(1, 100000),
         random.randint(1, 1000),
-        "Completed"  # temporary status
+        "2026-09-03",
+        random.choice(statuses)
     )
     for _ in range(500000)
 ]
 
-# Randomize statuses separately
-appointments = [
-    (patient_id, doctor_id, random.choice(statuses))
-    for patient_id, doctor_id, _ in appointments
-]
+print("Inserting appointments...")
 
-cur.executemany(
+execute_values(
+    cur,
     """
     INSERT INTO appointments
     (patient_id, doctor_id, appointment_date, status)
-    VALUES (%s, %s, CURRENT_DATE, %s)
+    VALUES %s
     """,
-    appointments
+    appointments,
+    page_size=1000
 )
+
+conn.commit()
 
 print("Appointments inserted:", len(appointments))
 
-
-conn.commit()
 
 cur.close()
 conn.close()
